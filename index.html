@@ -40,11 +40,11 @@
           excelData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
           displayExcelData(excelData);
-          document.getElementById('response').innerText = 'File uploaded successfully';
+          document.getElementById('response').innerText = 'Arquivo carregado com sucesso';
         };
         reader.readAsArrayBuffer(file);
       } else {
-        document.getElementById('response').innerText = 'No file selected';
+        document.getElementById('response').innerText = 'Nenhum arquivo selecionado';
       }
     }
 
@@ -79,7 +79,7 @@
 
     function submitQuery() {
       const query = document.getElementById('queryInput').value;
-      axios.post('YOUR_BACKEND_ENDPOINT', {
+      axios.post('https://gpt-excel-2sbctlsun-mauthopes-projects.vercel.app/api/query', {
         query: query,
         data: excelData
       })
@@ -88,7 +88,7 @@
         })
         .catch(error => {
           console.error('Error:', error);
-          document.getElementById('queryResponse').innerText = 'Error fetching response';
+          document.getElementById('queryResponse').innerText = 'Erro ao buscar resposta';
         });
     }
   </script>
