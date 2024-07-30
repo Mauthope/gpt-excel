@@ -1,21 +1,33 @@
-const fetch = require('node-fetch');
+const { Configuration, OpenAIApi } = require('openai');
+
+const openai = new OpenAIApi(new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+}));
 
 module.exports = async (req, res) => {
-  const { query, data } = req.body;
-  const prompt = `Responda a seguinte consulta baseada nos dados do Excel: ${query}\n\n${JSON.stringify(data)}`;
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  const response = await fetch('https://api.openai.com/v1/engines/text-davinci-003/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': sk - proj - uqNtPd91tKlIRwQ02M3oT3BlbkFJCfIZdLgEWVNTAfInnStK
-    },
-    body: JSON.stringify({
-      prompt: prompt,
-      max_tokens: 150
-    })
-  });
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
 
-  const result = await response.json();
-  res.status(200).json({ response: result.choices[0].text.trim() });
+  if (req.method === 'POST') {
+    const { query, data } = req.body;
+
+    try {
+      const response = await openai.createCompletion({
+        model: 'text-davinci-003',
+        prompt: `Data: ${JSON.stringify(data)}\nQuery: ${query}`,
+        max_tokens: 150,
+      });
+
+      res.status(200).json({ response: response.data.choices[0].text });
+    } catch (error) {
+      res.status(500).json({ error: 'Erro ao consultar a API da OpenAI' });
+    }
+  } else {
+    res.status(405).json({ error: 'Método não permitido' });
+  }
 };
